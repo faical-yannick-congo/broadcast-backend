@@ -78,7 +78,7 @@ def broadcast_today_city(country, city):
     else:
         return service_response(405, 'Method not allowed', 'This endpoint supports only a GET method.')
 
-@app.route(SERVICE_URL + '/prediction/delete/<broadcast_id>', methods=['GET','POST','PUT','UPDATE','DELETE'])
+@app.route(SERVICE_URL + '/message/delete/<broadcast_id>', methods=['GET','POST','PUT','UPDATE','DELETE'])
 @crossdomain(fk=fk, app=app, origin='*')
 def delete_broadcast(broadcast_id):
     if fk.request.method == 'GET':
