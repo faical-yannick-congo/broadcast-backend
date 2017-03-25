@@ -101,13 +101,18 @@ def message_send():
             sender = data.get('sender', None)
             content = data.get('content', None)
             recipient = data.get('recipient', 'all')
+            country = data.get('country', None)
+            city = data.get('city', None)
 
             if sender is None and content is None:
                 return service_response(405, 'Message send denied', 'A message has to contain a sender number and a content.')
             else:
-                pn = phonenumbers.parse(sender, None)
-                country = str(pn.country_code)
-                _country = get_country(country)
+                if country:
+                    _country = get_country(country)
+                else:
+                    pn = phonenumbers.parse(sender, None)
+                    country = str(pn.country_code)
+                    _country = get_country(country)
                 if _country is None:
                     return service_response(204, 'Unknown country', 'We could not find this country.')
                 else:
@@ -124,19 +129,19 @@ def message_send():
                     date = datetime.datetime.strptime(day, "%Y-%m-%d")
                     ignore, language = get_cities(country)
                     translator = Translator(to_lang=language)
-
-                    city = get_user_city(country, sender)
                     if city is None:
-                        return service_response(405, translator.translate('Message send denied'), translator.translate('You must register first to our servcies. Send us your city to +12408052607'))
+                        city = get_user_city(country, sender)
+                        if city is None:
+                            return service_response(405, translator.translate('Message send denied'), translator.translate('You must register first to our servcies. Send us your city to +12408052607'))
 
-                    broadcasts_to_send = Broadcast.objects(sender=sender, city=city.lower(), country=country,  day=day)
+                    broadcasts_to_send = Broadcast.objects(sender=sender, recipient=recipient, city=city.lower(), country=country,  day=day)
                     for broad in broadcasts_to_send:
                         if broad.message == content:
                             return service_response(204, translator.translate('Message not saved'), translator.translate('You have already sent this message today.'))
                     if len(broadcasts_to_send) == 10:
                         return service_response(204, translator.translate('Message not saved'), translator.translate('You have already sent 10 messages today.'))
 
-                    broadcast = Broadcast(created_at=str(datetime.datetime.utcnow()), sender=sender, city=city.lower(), country=country, day=day)
+                    broadcast = Broadcast(created_at=str(datetime.datetime.utcnow()), sender=sender, recipient=recipient, city=city.lower(), country=country, day=day)
                     broadcast.message = content
                     broadcast.save()
                     return service_response(200, translator.translate('Your message was received'), translator.translate('It will be broadcasted soon.'))
