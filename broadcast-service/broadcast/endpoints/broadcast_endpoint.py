@@ -107,12 +107,7 @@ def message_send():
             if sender is None and content is None:
                 return service_response(405, 'Message send denied', 'A message has to contain a sender number and a content.')
             else:
-                if country:
-                    _country = get_country(country)
-                else:
-                    pn = phonenumbers.parse(sender, None)
-                    country = str(pn.country_code)
-                    _country = get_country(country)
+                _country = get_country(country)
                 if _country is None:
                     return service_response(204, 'Unknown country', 'We could not find this country.')
                 else:
@@ -129,24 +124,19 @@ def message_send():
                     date = datetime.datetime.strptime(day, "%Y-%m-%d")
                     ignore, language = get_cities(country)
                     translator = Translator(to_lang=language)
+                    if city:
+                        city = fetch_city(city, country)
+                    else:
+                        city = "all"
                     if city is None:
-                        city = get_user_city(country, sender)
-                        if city is None:
-                            return service_response(405, translator.translate('Message send denied'), translator.translate('You must register first to our servcies. Send us your city to +12408052607'))
-
-                    broadcasts_to_send = Broadcast.objects(sender=sender, recipient=recipient, city=city.lower(), country=country,  day=day)
-                    for broad in broadcasts_to_send:
-                        if broad.message == content:
-                            return service_response(204, translator.translate('Message not saved'), translator.translate('You have already sent this message today.'))
-                    if len(broadcasts_to_send) == 10:
-                        return service_response(204, translator.translate('Message not saved'), translator.translate('You have already sent 10 messages today.'))
+                        return service_response(405, translator.translate('Message send denied'), translator.translate('You must register first to our servcies. Send us your city to +12408052607'))
 
                     broadcast = Broadcast(created_at=str(datetime.datetime.utcnow()), sender=sender, recipient=recipient, city=city.lower(), country=country, day=day)
                     broadcast.message = content
                     broadcast.save()
                     return service_response(200, translator.translate('Your message was received'), translator.translate('It will be broadcasted soon.'))
         else:
-            return service_response(204, 'User registration failed', 'No data submitted.')
+            return service_response(204, 'Message send failed', 'No data submitted.')
     else:
         return service_response(405, 'Method not allowed', 'This endpoint supports only a POST method.')
 

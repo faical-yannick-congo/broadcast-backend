@@ -93,24 +93,6 @@ def fetch_city(city, country):
         return None
     else:
         return {"name":results[0]["name"].split(',')[0], "zmw":results[0]["zmw"]}
-    return [c['name'] for c in response['content']['cities']], response['content']['language']
-
-def get_weather(city, country):
-    tomorrow = {"title":"", "day":"", "night":""}
-    fetched = fetch_city(city, country)
-    if fetched:
-        # r = requests.get('http://api.openweathermap.org/data/2.5/forecast?q={0},{1}&appid=eb7cda08edf98390707005f5cbde3fe6'.format(city, country))
-        r = requests.get('http://api.wunderground.com/api/d62a84b41d6cee51/forecast/q/zmw:{0}.json'.format(fetched["zmw"]))
-        response = json.loads(r.text)
-        threedays = response["forecast"]["txt_forecast"]["forecastday"]
-        for threeday in threedays:
-            if threeday["period"] == 2:
-                tomorrow["day"] = threeday["fcttext_metric"]
-                tomorrow["title"] = "The weather tomorrow {0} in {1}, {2}".format(threeday["title"], city, country)
-            if threeday["period"] == 3:
-                tomorrow["night"] = threeday["fcttext_metric"]
-                break
-    return tomorrow
 
 # import all the api endpoints.
 import broadcast.endpoints
