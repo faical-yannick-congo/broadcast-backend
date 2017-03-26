@@ -90,7 +90,7 @@ def fetch_city(city, country):
     response = json.loads(r.text)
     results = response["RESULTS"]
     if len(results) == 0:
-        return None
+        return "capital"
     else:
         return results[0]["name"].split(',')[0]
 
