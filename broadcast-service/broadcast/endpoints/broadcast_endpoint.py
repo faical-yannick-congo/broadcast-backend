@@ -125,7 +125,7 @@ def message_send():
                     ignore, language = get_cities(country)
                     translator = Translator(to_lang=language)
                     if city:
-                        city = fetch_city(city, _country.name.split(":")[0])
+                        city = fetch_city(city, _country["name"].split(":")[0])
                     else:
                         city = "all"
                     if city is None:
