@@ -92,7 +92,7 @@ def fetch_city(city, country):
     if len(results) == 0:
         return None
     else:
-        return {"name":results[0]["name"].split(',')[0], "zmw":results[0]["zmw"]}
+        return results[0]["name"].split(',')[0]
 
 # import all the api endpoints.
 import broadcast.endpoints
