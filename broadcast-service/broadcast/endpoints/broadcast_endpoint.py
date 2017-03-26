@@ -4,7 +4,7 @@ from flask.ext.api import status
 import flask as fk
 
 from broadcastdb.common import crossdomain
-from broadcast import app, SERVICE_URL, service_response, get_user_city, get_country, get_one_number, get_cities, menu
+from broadcast import app, SERVICE_URL, service_response, fetch_city, get_user_city, get_country, get_one_number, get_cities, menu
 from broadcastdb.common.models import Broadcast
 from time import gmtime, strftime
 
