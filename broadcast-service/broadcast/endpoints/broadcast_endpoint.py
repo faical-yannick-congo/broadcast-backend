@@ -160,7 +160,10 @@ def broadcast_pushing_country(country, city):
             day = str(now_time).split(" ")[0]
             date = datetime.datetime.strptime(day, "%Y-%m-%d")
 
-            broadcast_pulled = Broadcast.objects(city=city.lower(), country=country, status='pulled', day=day).first()
+            if city == "all":
+                broadcast_pulled = Broadcast.objects(country=country, status='pulled', day=day).first()
+            else:
+                broadcast_pulled = Broadcast.objects(city=city.lower(), country=country, status='pulled', day=day).first()
 
             if broadcast_pulled:
                 broadcast_pulled.status = 'pushing'
